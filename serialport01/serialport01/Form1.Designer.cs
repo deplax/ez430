@@ -31,16 +31,27 @@
 	        this.components = new System.ComponentModel.Container();
 	        this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
 	        this.comboBox1 = new System.Windows.Forms.ComboBox();
-	        this.button1 = new System.Windows.Forms.Button();
-	        this.textBox1 = new System.Windows.Forms.TextBox();
-	        this.button2 = new System.Windows.Forms.Button();
-	        this.textBox2 = new System.Windows.Forms.TextBox();
+	        this.btnOpen = new System.Windows.Forms.Button();
+	        this.textBoxSend = new System.Windows.Forms.TextBox();
+	        this.btnSend = new System.Windows.Forms.Button();
+	        this.textBoxDialog = new System.Windows.Forms.TextBox();
 	        this.checkBox1 = new System.Windows.Forms.CheckBox();
 	        this.btnclose = new System.Windows.Forms.Button();
 	        this.btnAPStart = new System.Windows.Forms.Button();
 	        this.btnAPStop = new System.Windows.Forms.Button();
 	        this.btnBGPolling = new System.Windows.Forms.Button();
 	        this.btnACC = new System.Windows.Forms.Button();
+	        this.btnTestkey = new System.Windows.Forms.Button();
+	        this.keyInputTimer = new System.Windows.Forms.Timer(this.components);
+	        this.rxTimer = new System.Windows.Forms.Timer(this.components);
+	        this.chkRepeat = new System.Windows.Forms.CheckBox();
+	        this.txtRepeat = new System.Windows.Forms.TextBox();
+	        this.lblshowx = new System.Windows.Forms.Label();
+	        this.lblshowy = new System.Windows.Forms.Label();
+	        this.lblshowz = new System.Windows.Forms.Label();
+	        this.lblxx = new System.Windows.Forms.Label();
+	        this.lblyy = new System.Windows.Forms.Label();
+	        this.lblzz = new System.Windows.Forms.Label();
 	        this.SuspendLayout();
 	        // 
 	        // comboBox1
@@ -51,41 +62,41 @@
 	        this.comboBox1.Size = new System.Drawing.Size(121, 20);
 	        this.comboBox1.TabIndex = 0;
 	        // 
-	        // button1
+	        // btnOpen
 	        // 
-	        this.button1.Location = new System.Drawing.Point(139, 12);
-	        this.button1.Name = "button1";
-	        this.button1.Size = new System.Drawing.Size(75, 23);
-	        this.button1.TabIndex = 1;
-	        this.button1.Text = "open";
-	        this.button1.UseVisualStyleBackColor = true;
-	        this.button1.Click += new System.EventHandler(this.button1_Click);
+	        this.btnOpen.Location = new System.Drawing.Point(139, 12);
+	        this.btnOpen.Name = "btnOpen";
+	        this.btnOpen.Size = new System.Drawing.Size(75, 23);
+	        this.btnOpen.TabIndex = 1;
+	        this.btnOpen.Text = "open";
+	        this.btnOpen.UseVisualStyleBackColor = true;
+	        this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
 	        // 
-	        // textBox1
+	        // textBoxSend
 	        // 
-	        this.textBox1.Location = new System.Drawing.Point(12, 70);
-	        this.textBox1.Name = "textBox1";
-	        this.textBox1.Size = new System.Drawing.Size(283, 21);
-	        this.textBox1.TabIndex = 2;
+	        this.textBoxSend.Location = new System.Drawing.Point(12, 157);
+	        this.textBoxSend.Name = "textBoxSend";
+	        this.textBoxSend.Size = new System.Drawing.Size(283, 21);
+	        this.textBoxSend.TabIndex = 2;
 	        // 
-	        // button2
+	        // btnSend
 	        // 
-	        this.button2.Location = new System.Drawing.Point(302, 70);
-	        this.button2.Name = "button2";
-	        this.button2.Size = new System.Drawing.Size(75, 23);
-	        this.button2.TabIndex = 3;
-	        this.button2.Text = "send";
-	        this.button2.UseVisualStyleBackColor = true;
-	        this.button2.Click += new System.EventHandler(this.button2_Click);
+	        this.btnSend.Location = new System.Drawing.Point(302, 157);
+	        this.btnSend.Name = "btnSend";
+	        this.btnSend.Size = new System.Drawing.Size(75, 23);
+	        this.btnSend.TabIndex = 3;
+	        this.btnSend.Text = "send";
+	        this.btnSend.UseVisualStyleBackColor = true;
+	        this.btnSend.Click += new System.EventHandler(this.btnSend_Click);
 	        // 
-	        // textBox2
+	        // textBoxDialog
 	        // 
-	        this.textBox2.Location = new System.Drawing.Point(12, 97);
-	        this.textBox2.Multiline = true;
-	        this.textBox2.Name = "textBox2";
-	        this.textBox2.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-	        this.textBox2.Size = new System.Drawing.Size(365, 274);
-	        this.textBox2.TabIndex = 4;
+	        this.textBoxDialog.Location = new System.Drawing.Point(12, 184);
+	        this.textBoxDialog.Multiline = true;
+	        this.textBoxDialog.Name = "textBoxDialog";
+	        this.textBoxDialog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+	        this.textBoxDialog.Size = new System.Drawing.Size(365, 274);
+	        this.textBoxDialog.TabIndex = 4;
 	        // 
 	        // checkBox1
 	        // 
@@ -149,21 +160,123 @@
 	        this.btnACC.UseVisualStyleBackColor = true;
 	        this.btnACC.Click += new System.EventHandler(this.btnACC_Click);
 	        // 
+	        // btnTestkey
+	        // 
+	        this.btnTestkey.Location = new System.Drawing.Point(302, 70);
+	        this.btnTestkey.Name = "btnTestkey";
+	        this.btnTestkey.Size = new System.Drawing.Size(75, 23);
+	        this.btnTestkey.TabIndex = 11;
+	        this.btnTestkey.Text = "btnTestkey";
+	        this.btnTestkey.UseVisualStyleBackColor = true;
+	        this.btnTestkey.Click += new System.EventHandler(this.btnTestkey_Click);
+	        // 
+	        // keyInputTimer
+	        // 
+	        this.keyInputTimer.Tick += new System.EventHandler(this.keyInputTimer_Tick);
+	        // 
+	        // rxTimer
+	        // 
+	        this.rxTimer.Tick += new System.EventHandler(this.rxTimer_Tick);
+	        // 
+	        // chkRepeat
+	        // 
+	        this.chkRepeat.AutoSize = true;
+	        this.chkRepeat.Checked = true;
+	        this.chkRepeat.CheckState = System.Windows.Forms.CheckState.Checked;
+	        this.chkRepeat.Location = new System.Drawing.Point(13, 68);
+	        this.chkRepeat.Name = "chkRepeat";
+	        this.chkRepeat.Size = new System.Drawing.Size(96, 16);
+	        this.chkRepeat.TabIndex = 12;
+	        this.chkRepeat.Text = "Repeat Send";
+	        this.chkRepeat.UseVisualStyleBackColor = true;
+	        this.chkRepeat.CheckedChanged += new System.EventHandler(this.chkRepeat_CheckedChanged);
+	        // 
+	        // txtRepeat
+	        // 
+	        this.txtRepeat.Location = new System.Drawing.Point(13, 90);
+	        this.txtRepeat.Name = "txtRepeat";
+	        this.txtRepeat.Size = new System.Drawing.Size(100, 21);
+	        this.txtRepeat.TabIndex = 13;
+	        this.txtRepeat.Text = "500";
+	        // 
+	        // lblshowx
+	        // 
+	        this.lblshowx.AutoSize = true;
+	        this.lblshowx.Location = new System.Drawing.Point(120, 90);
+	        this.lblshowx.Name = "lblshowx";
+	        this.lblshowx.Size = new System.Drawing.Size(23, 12);
+	        this.lblshowx.TabIndex = 14;
+	        this.lblshowx.Text = "xx:";
+	        // 
+	        // lblshowy
+	        // 
+	        this.lblshowy.AutoSize = true;
+	        this.lblshowy.Location = new System.Drawing.Point(120, 114);
+	        this.lblshowy.Name = "lblshowy";
+	        this.lblshowy.Size = new System.Drawing.Size(23, 12);
+	        this.lblshowy.TabIndex = 15;
+	        this.lblshowy.Text = "yy:";
+	        // 
+	        // lblshowz
+	        // 
+	        this.lblshowz.AutoSize = true;
+	        this.lblshowz.Location = new System.Drawing.Point(120, 140);
+	        this.lblshowz.Name = "lblshowz";
+	        this.lblshowz.Size = new System.Drawing.Size(23, 12);
+	        this.lblshowz.TabIndex = 16;
+	        this.lblshowz.Text = "zz:";
+	        // 
+	        // lblxx
+	        // 
+	        this.lblxx.AutoSize = true;
+	        this.lblxx.Location = new System.Drawing.Point(150, 90);
+	        this.lblxx.Name = "lblxx";
+	        this.lblxx.Size = new System.Drawing.Size(11, 12);
+	        this.lblxx.TabIndex = 17;
+	        this.lblxx.Text = "-";
+	        // 
+	        // lblyy
+	        // 
+	        this.lblyy.AutoSize = true;
+	        this.lblyy.Location = new System.Drawing.Point(150, 114);
+	        this.lblyy.Name = "lblyy";
+	        this.lblyy.Size = new System.Drawing.Size(11, 12);
+	        this.lblyy.TabIndex = 18;
+	        this.lblyy.Text = "-";
+	        // 
+	        // lblzz
+	        // 
+	        this.lblzz.AutoSize = true;
+	        this.lblzz.Location = new System.Drawing.Point(150, 139);
+	        this.lblzz.Name = "lblzz";
+	        this.lblzz.Size = new System.Drawing.Size(11, 12);
+	        this.lblzz.TabIndex = 19;
+	        this.lblzz.Text = "-";
+	        // 
 	        // Form1
 	        // 
 	        this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
 	        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-	        this.ClientSize = new System.Drawing.Size(387, 383);
+	        this.ClientSize = new System.Drawing.Size(394, 472);
+	        this.Controls.Add(this.lblzz);
+	        this.Controls.Add(this.lblyy);
+	        this.Controls.Add(this.lblxx);
+	        this.Controls.Add(this.lblshowz);
+	        this.Controls.Add(this.lblshowy);
+	        this.Controls.Add(this.lblshowx);
+	        this.Controls.Add(this.txtRepeat);
+	        this.Controls.Add(this.chkRepeat);
+	        this.Controls.Add(this.btnTestkey);
 	        this.Controls.Add(this.btnACC);
 	        this.Controls.Add(this.btnBGPolling);
 	        this.Controls.Add(this.btnAPStop);
 	        this.Controls.Add(this.btnAPStart);
 	        this.Controls.Add(this.btnclose);
 	        this.Controls.Add(this.checkBox1);
-	        this.Controls.Add(this.textBox2);
-	        this.Controls.Add(this.button2);
-	        this.Controls.Add(this.textBox1);
-	        this.Controls.Add(this.button1);
+	        this.Controls.Add(this.textBoxDialog);
+	        this.Controls.Add(this.btnSend);
+	        this.Controls.Add(this.textBoxSend);
+	        this.Controls.Add(this.btnOpen);
 	        this.Controls.Add(this.comboBox1);
 	        this.Name = "Form1";
 	        this.Text = "ez430 serialport";
@@ -178,16 +291,27 @@
 
 	private System.IO.Ports.SerialPort serialPort1;
 	private System.Windows.Forms.ComboBox comboBox1;
-	private System.Windows.Forms.Button button1;
-	private System.Windows.Forms.TextBox textBox1;
-	private System.Windows.Forms.Button button2;
-	private System.Windows.Forms.TextBox textBox2;
+	private System.Windows.Forms.Button btnOpen;
+	private System.Windows.Forms.TextBox textBoxSend;
+	private System.Windows.Forms.Button btnSend;
+	private System.Windows.Forms.TextBox textBoxDialog;
 	private System.Windows.Forms.CheckBox checkBox1;
 	private System.Windows.Forms.Button btnclose;
 	private System.Windows.Forms.Button btnAPStart;
 	private System.Windows.Forms.Button btnAPStop;
 	private System.Windows.Forms.Button btnBGPolling;
 	private System.Windows.Forms.Button btnACC;
+	private System.Windows.Forms.Button btnTestkey;
+	private System.Windows.Forms.Timer keyInputTimer;
+	private System.Windows.Forms.Timer rxTimer;
+	private System.Windows.Forms.CheckBox chkRepeat;
+	private System.Windows.Forms.TextBox txtRepeat;
+	private System.Windows.Forms.Label lblshowx;
+	private System.Windows.Forms.Label lblshowy;
+	private System.Windows.Forms.Label lblshowz;
+	private System.Windows.Forms.Label lblxx;
+	private System.Windows.Forms.Label lblyy;
+	private System.Windows.Forms.Label lblzz;
         }
 }
 

@@ -13,6 +13,8 @@ namespace serialport01
 {
         public partial class Form1 : Form
         {
+	int accState = 0;			        //0 미작동, 1 작동중
+
 	public Form1()
 	{
 	        InitializeComponent();
@@ -52,25 +54,25 @@ namespace serialport01
 	{
 	        serialPort1.Close();
 	}
-
-	private void button1_Click(object sender, EventArgs e)
+	private void btnOpen_Click(object sender, EventArgs e)
 	{
-	        if(comboBox1.Text == "")
+	        if (comboBox1.Text == "")
 	        {
 		MessageBox.Show("자네 포트를 설정하지 않았다네...");
 	        }
-	        else 
+	        else
 		Open_serial();
 	        //byte[] buffer_send = new byte[1];
 	        //buffer_send[1] = 0xff;
 	        //serialPort1.Write(buffer_send, 0, 1);
-
 	}
-
-	private void button2_Click(object sender, EventArgs e)
+	
+	private void btnSend_Click(object sender, EventArgs e)
 	{
-	        sendmsg(textBox1.Text);
+	        sendmsg(textBoxSend.Text);
 	}
+
+
 	void EventDataReceived(object sender, SerialDataReceivedEventArgs e)
 	{
 	        CheckForIllegalCrossThreadCalls = false;	//보안에러 무시용 구문
@@ -85,12 +87,21 @@ namespace serialport01
 		serialPort1.Read(buff, 0, iRecSize);
 
 		for (int iTemp = 0; iTemp < iRecSize; iTemp++)
+		{
 		        if (checkBox1.Checked)
-			strRxData += " " + buff[iTemp].ToString("X2");
+			strRxData += " " + buff[iTemp].ToString();
 		        else
 			strRxData += Convert.ToChar(buff[iTemp]);
-		textBox2.Text += strRxData;
-		textBox2.AppendText("\r\n");
+
+		        if(iRecSize == 7 && buff[3].ToString("X2") == "01")
+		        {
+			lblxx.Text = buff[4].ToString();
+			lblyy.Text = buff[5].ToString();
+			lblzz.Text = buff[6].ToString();
+		        }
+		}
+		textBoxDialog.Text += strRxData;
+		textBoxDialog.AppendText("\r\n");
 	        }
 	}
 
@@ -135,8 +146,65 @@ namespace serialport01
 
 	private void btnACC_Click(object sender, EventArgs e)
 	{
-	        sendmsg("ff 08 07 00 00 00 00");
+
+	        if(chkRepeat.Checked && accState == 0)
+	        {
+		rxTimer.Interval = Convert.ToInt32(txtRepeat.Text);
+		rxTimer.Enabled = true;
+		btnACC.Text = "ACC Stop";
+		accState = 1;
+	        }
+	        else if(accState == 1)
+	        {
+		rxTimer.Enabled = false;
+		btnACC.Text = "ACC";
+		accState = 0;
+	        }
+
+	        else
+	        {
+		sendmsg("ff 08 07 00 00 00 00");
+	        }
 	        
 	}
+
+	private void btnTestkey_Click(object sender, EventArgs e)
+	{
+	        keyInputTimer.Interval = 500;
+	        keyInputTimer.Enabled = true;
+
+	}
+
+	private void keyInputTimer_Tick(object sender, EventArgs e)
+	{
+	        SendKeys.Send("{RIGHT}");
+	}
+
+	private void chkRepeat_CheckedChanged(object sender, EventArgs e)
+	{
+	        if(chkRepeat.Checked)
+	        {
+		txtRepeat.Enabled = true;
+	        }
+	        else
+	        {
+		txtRepeat.Enabled = false;
+	        }
+	}
+
+	private void rxTimer_Tick(object sender, EventArgs e)
+	{
+	        if(chkRepeat.Checked)
+	        {
+		sendmsg("ff 08 07 00 00 00 00");
+	        }
+	        //여기에 감지해서 넘어가는거 만들면 됨
+
+
+	}
+
+
+
+
         }
 }
