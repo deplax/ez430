@@ -11,248 +11,253 @@ using System.IO.Ports;			        //시리얼포트를 위한
 
 namespace serialport01
 {
-        public partial class Form1 : Form
-        {
-	int accState = 0;			        //0 미작동, 1 작동중
-	int xx = 0, yy = 0, zz = 0;
-
-	int[] statCnt = new int[3];
-	bool[] statFlag = new bool[9];
-
-	int roopCnt = 0;
-	int swFlag = 0;
-
-	public Form1()
+	public partial class Form1 : Form
 	{
-	        InitializeComponent();
-	        serialPort1.DataReceived += new SerialDataReceivedEventHandler(EventDataReceived);
+		int accState = 0;			        //0 미작동, 1 작동중
+		int xx = 0, yy = 0, zz = 0;
 
-	        for (int i = 0; i < statFlag.Length; i++ )
-		statFlag[i] = false;
+		int[] statCnt = new int[3];
+		bool[] statFlag = new bool[9];
 
-	        for (int i = 0; i < statCnt.Length; i++)
-		statCnt[i] = 0;
-	}	
+		int roopCnt = 0;
+		int swFlag = 0;
 
-	private void Form1_Load(object sender, EventArgs e)
-	{
-	        find_serial();
-	}
-
-
-
-	private void find_serial()		        //시리얼 포트 몽땅 검색해서 콤포박스에 넣음
-	{
-	        string[] portsArray = SerialPort.GetPortNames();
-	        foreach (string portnumber in portsArray)
-	        {
-		comboBox1.Items.Add(portnumber);
-	        }
-	        comboBox1.SelectedIndex = 1;
-	}
-
-	private void Open_serial()
-	{
-	        if (serialPort1.IsOpen) serialPort1.Close();
-
-	        serialPort1.PortName = comboBox1.Text;
-	        serialPort1.BaudRate = 115200;
-	        serialPort1.Parity = Parity.None;
-	        serialPort1.DataBits = 8;
-	        serialPort1.StopBits = StopBits.One;
-	        serialPort1.Open();
-	}
-
-	private void Form1_FormClosed(object sender, FormClosedEventArgs e)
-	{
-	        serialPort1.Close();
-	}
-	private void btnOpen_Click(object sender, EventArgs e)
-	{
-	        if (comboBox1.Text == "")
-	        {
-		MessageBox.Show("자네 포트를 설정하지 않았다네...");
-	        }
-	        else
-		Open_serial();
-
-	        //byte[] buffer_send = new byte[1];
-	        //buffer_send[1] = 0xff;
-	        //serialPort1.Write(buffer_send, 0, 1);
-	}
-
-	private void btnSend_Click(object sender, EventArgs e)
-	{
-	        sendmsg(textBoxSend.Text);
-	}
-
-
-	void EventDataReceived(object sender, SerialDataReceivedEventArgs e)
-	{
-	        CheckForIllegalCrossThreadCalls = false;	//보안에러 무시용 구문
-	        int iRecSize = serialPort1.BytesToRead;		//수신 버퍼에 있는 바이트 수 가져옴
-	        string strRxData;
-
-	        if (iRecSize != 0)							// 수신된 데이터의 수가 0이 아닐때만 처리하자
-	        {
-		strRxData = "";
-		byte[] buff = new byte[iRecSize];
-
-		serialPort1.Read(buff, 0, iRecSize);
-
-		for (int iTemp = 0; iTemp < iRecSize; iTemp++)
+		public Form1()
 		{
-		        if (checkBox1.Checked && iRecSize == 7)
-			if (buff[3].ToString("X2") != "FF")
-			        strRxData += " " + buff[iTemp].ToString();
-		        //else
-		        //	strRxData += Convert.ToChar(buff[iTemp]);
+			InitializeComponent();
+			serialPort1.DataReceived += new SerialDataReceivedEventHandler(EventDataReceived);
 
-		        if (iRecSize == 7 && buff[3].ToString("X2") == "01")
-		        {
-			lblxx.Text = buff[4].ToString();
-			lblyy.Text = buff[5].ToString();
-			lblzz.Text = buff[6].ToString();
+			for (int i = 0; i < statFlag.Length; i++)
+				statFlag[i] = false;
 
-			xx = Convert.ToInt32(buff[4].ToString());
-			yy = Convert.ToInt32(buff[5].ToString());
-			zz = Convert.ToInt32(buff[6].ToString());
-		        }
-		}
-		if (strRxData != "")
-		{
-		        textBoxDialog.Text += strRxData;
-		        textBoxDialog.AppendText("\r\n");
-		        testsnap(ref statFlag[0], ref statFlag[1], ref statFlag[2], ref statCnt[0]);
+			for (int i = 0; i < statCnt.Length; i++)
+				statCnt[i] = 0;
 		}
 
-		///////////////////////////////////////////////////////////////////////////////////////
-		
-		/*
-		if (statFlag[0]== true)
+		private void Form1_Load(object sender, EventArgs e)
 		{
-		        testsnap(ref statFlag[3], ref statFlag[4], ref statFlag[5], ref statCnt[1]);
+			find_serial();
 		}
-		*/
-		/*
-		if(statFlag[0] == true && statFlag[3] == true)
+
+
+
+		private void find_serial()		        //시리얼 포트 몽땅 검색해서 콤포박스에 넣음
 		{
-		        testsnap(ref statFlag[6], ref statFlag[7], ref statFlag[8], ref statCnt[2]);
+			string[] portsArray = SerialPort.GetPortNames();
+			foreach (string portnumber in portsArray)
+			{
+				comboBox1.Items.Add(portnumber);
+			}
+			comboBox1.SelectedIndex = 0;
 		}
-		roopCnt++;
-		 */
-		///////////////////////////////////////////////////////////////////////////////////////
-	        }
-	}
-	private void testsnap(ref bool statFlag1, ref bool statFlag2, ref bool statFlag3, ref int statCnt)
-	{
-	        /*
-	        if (tstRange(xx, 208, 10 + 40) && tstRange(yy, 240, 5 + 45) && tstRange(zz, 210, 10 + 40) && statFlag1 == false)
-	        {
+
+		private void Open_serial()
+		{
+			if (serialPort1.IsOpen) serialPort1.Close();
+
+			serialPort1.PortName = comboBox1.Text;
+			serialPort1.BaudRate = 115200;
+			serialPort1.Parity = Parity.None;
+			serialPort1.DataBits = 8;
+			serialPort1.StopBits = StopBits.One;
+			serialPort1.Open();
+		}
+
+		private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+		{
+			serialPort1.Close();
+		}
+		private void btnOpen_Click(object sender, EventArgs e)
+		{
+			if (comboBox1.Text == "")
+			{
+				MessageBox.Show("자네 포트를 설정하지 않았다네...");
+			}
+			else
+				Open_serial();
+
+			//byte[] buffer_send = new byte[1];
+			//buffer_send[1] = 0xff;
+			//serialPort1.Write(buffer_send, 0, 1);
+		}
+
+		private void btnSend_Click(object sender, EventArgs e)
+		{
+			sendmsg(textBoxSend.Text);
+		}
+
+
+		void EventDataReceived(object sender, SerialDataReceivedEventArgs e)
+		{
+			CheckForIllegalCrossThreadCalls = false;	//보안에러 무시용 구문
+			int iRecSize = serialPort1.BytesToRead;		//수신 버퍼에 있는 바이트 수 가져옴
+			string strRxData;
+
+			if (iRecSize != 0)							// 수신된 데이터의 수가 0이 아닐때만 처리하자
+			{
+				strRxData = "";
+				byte[] buff = new byte[iRecSize];
+
+				serialPort1.Read(buff, 0, iRecSize);
+
+				for (int iTemp = 0; iTemp < iRecSize; iTemp++)
+				{
+					if (checkBox1.Checked && iRecSize == 7)
+						if (buff[3].ToString("X2") != "FF")
+							strRxData += " " + buff[iTemp].ToString();
+					//else
+					//	strRxData += Convert.ToChar(buff[iTemp]);
+
+					if (iRecSize == 7 && buff[3].ToString("X2") == "01")
+					{
+						lblxx.Text = buff[4].ToString();
+						lblyy.Text = buff[5].ToString();
+						lblzz.Text = buff[6].ToString();
+
+						xx = Convert.ToInt32(buff[4].ToString());
+						yy = Convert.ToInt32(buff[5].ToString());
+						zz = Convert.ToInt32(buff[6].ToString());
+					}
+				}
+				if (strRxData != "")
+				{
+					textBoxDialog.Text += strRxData;
+					textBoxDialog.AppendText("\r\n");
+					testsnap(ref statFlag[0], ref statFlag[1], ref statFlag[2], ref statCnt[0]);
+					if (textBoxDialog.Lines.Length > 100)
+					{
+						textBoxDialog.Text = "";
+					}
+				}
+
+				///////////////////////////////////////////////////////////////////////////////////////
+
+				/*
+				if (statFlag[0]== true)
+				{
+						testsnap(ref statFlag[3], ref statFlag[4], ref statFlag[5], ref statCnt[1]);
+				}
+				*/
+				/*
+				if(statFlag[0] == true && statFlag[3] == true)
+				{
+						testsnap(ref statFlag[6], ref statFlag[7], ref statFlag[8], ref statCnt[2]);
+				}
+				roopCnt++;
+				 */
+				///////////////////////////////////////////////////////////////////////////////////////
+			}
+		}
+		private void testsnap(ref bool statFlag1, ref bool statFlag2, ref bool statFlag3, ref int statCnt)
+		{
+			/*
+			if (tstRange(xx, 208, 10 + 40) && tstRange(yy, 240, 5 + 45) && tstRange(zz, 210, 10 + 40) && statFlag1 == false)
+			{
 		statFlag1 = true;
 		statCnt = 0;
 		label1.Text = "pass";
-	        }
-	        else if (tstRange(xx, 28, 20 + 30 + 25) && tstRange(yy, 216, 10 + 40 + 25) && tstRange(zz, 183, 35 + 15 + 25) && statFlag2 == false)
-	        {
+			}
+			else if (tstRange(xx, 28, 20 + 30 + 25) && tstRange(yy, 216, 10 + 40 + 25) && tstRange(zz, 183, 35 + 15 + 25) && statFlag2 == false)
+			{
 		statFlag2 = true;
 		statCnt = 0;
 		label2.Text = "pass";
-	        }
-	        else if (tstRange(xx, 162, 35 + 15 + 25) && tstRange(yy, 35, 25 + 25 + 25) && tstRange(zz, 50, 10 + 40 + 25) && statFlag2 == false)
-	        {
+			}
+			else if (tstRange(xx, 162, 35 + 15 + 25) && tstRange(yy, 35, 25 + 25 + 25) && tstRange(zz, 50, 10 + 40 + 25) && statFlag2 == false)
+			{
 		statFlag2 = true;
 		statCnt = 0;
 		label2.Text = "pass";
-	        }
-	        else if (tstRange(xx, 205, 15 + 35) && tstRange(yy, 238, 8 + 32) && tstRange(zz, 222, 12 + 38) && statFlag3 == false && statFlag2 == true)
-	        {
+			}
+			else if (tstRange(xx, 205, 15 + 35) && tstRange(yy, 238, 8 + 32) && tstRange(zz, 222, 12 + 38) && statFlag3 == false && statFlag2 == true)
+			{
 		statFlag3 = true;
 		statCnt = 0;
 		label3.Text = "pass";
-	        }
+			}
 
-	        */
-	       
+			*/
 
-	        if(((xx + yy + zz) > 620 && statFlag1 == false) || statCnt >= 1)
-	        {
-		statFlag1 = true;
-		
-		label1.Text = "pass";
 
-		if (((xx < 50 || yy < 50 || zz < 50) && statFlag1 == true && statFlag2 == false) || statCnt >= 2)
-		{
-		        statFlag2 = true;
-		        statCnt = 2;
-		        label2.Text = "pass";
-		        if ((xx + yy + zz) > 600 && statFlag2 == true && statFlag3 == false)
-		        {
-			statFlag3 = true;
-			statCnt = 0;
-			label3.Text = "pass";
-
-			if (btnQ.Enabled == true)
-			        btnQ.Enabled = false;
-			else
-			        btnQ.Enabled = true;
-
-			SendKeys.SendWait("{RIGHT}");
-			statFlag1 = false;
-			statFlag2 = false;
-			statFlag3 = false;
-			label1.Text = "---";
-			label2.Text = "---";
-			label3.Text = "---";
-			swFlag = 0;
-			textBoxDialog.AppendText("succes!!");
-			textBoxDialog.AppendText("\r\n");
-		        }
-		        else
-		        {
-			if (swFlag <= 1)
+			if (((xx + yy + zz) > 620 && statFlag1 == false) || statCnt >= 1)
 			{
-			        statCnt = 2;
-			        swFlag++;
+				statFlag1 = true;
+
+				label1.Text = "pass";
+
+				if (((xx < 50 || yy < 50 || zz < 50) && statFlag1 == true && statFlag2 == false) || statCnt >= 2)
+				{
+					statFlag2 = true;
+					statCnt = 2;
+					label2.Text = "pass";
+					if ((xx + yy + zz) > 600 && statFlag2 == true && statFlag3 == false)
+					{
+						statFlag3 = true;
+						statCnt = 0;
+						label3.Text = "pass";
+
+						if (btnQ.Enabled == true)
+							btnQ.Enabled = false;
+						else
+							btnQ.Enabled = true;
+
+						SendKeys.SendWait("{RIGHT}");
+						statFlag1 = false;
+						statFlag2 = false;
+						statFlag3 = false;
+						label1.Text = "---";
+						label2.Text = "---";
+						label3.Text = "---";
+						swFlag = 0;
+						textBoxDialog.AppendText("succes!!");
+						textBoxDialog.AppendText("\r\n");
+
+					}
+					else
+					{
+						if (swFlag <= 1)
+						{
+							statCnt = 2;
+							swFlag++;
+						}
+						else
+						{
+							statCnt = 0;
+							statFlag1 = false;
+							statFlag2 = false;
+							statFlag3 = false;
+							label1.Text = "---";
+							label2.Text = "---";
+							label3.Text = "---";
+							swFlag = 0;
+						}
+					}
+				}
+				else
+				{
+					statCnt = 1;
+				}
 			}
 			else
 			{
-			        statCnt = 0;
-			        statFlag1 = false;
-			        statFlag2 = false;
-			        statFlag3 = false;
-			        label1.Text = "---";
-			        label2.Text = "---";
-			        label3.Text = "---";
-			        swFlag = 0;
-			}		
-		        }
-		}
-		else
-		{
-		        statCnt = 1;
-		}
-	        }
-	        else
-	        {
-		statFlag1 = false;
-		statFlag2 = false;
-		statFlag3 = false;
-		label1.Text = "---";
-		label2.Text = "---";
-		label3.Text = "---";
-	        }
+				statFlag1 = false;
+				statFlag2 = false;
+				statFlag3 = false;
+				label1.Text = "---";
+				label2.Text = "---";
+				label3.Text = "---";
+			}
 
-	        label4.Text = Convert.ToString(swFlag);
-	        /*
+			label4.Text = Convert.ToString(swFlag);
+			/*
 
-	        if (statFlag1 == true)
-	        {
+			if (statFlag1 == true)
+			{
 		statCnt++;
-	        }
+			}
 
-	        if (statCnt == 2)
-	        {
+			if (statCnt == 2)
+			{
 		statFlag1 = false;
 		statFlag2 = false;
 		statFlag3 = false;
@@ -260,139 +265,139 @@ namespace serialport01
 		label2.Text = "---";
 		label3.Text = "---";
 		statCnt = 0;
-	        }
-	         */
-	}
-
-	private void btnclose_Click(object sender, EventArgs e)
-	{
-	        serialPort1.Close();
-	}
-
-	private void btnAPStart_Click(object sender, EventArgs e)
-	{
-	        sendmsg("ff 07 03");
-	}
-
-	private void btnAPStop_Click(object sender, EventArgs e)
-	{
-	        sendmsg("ff 09 03");
-	}
-
-	private void sendmsg(string msg)
-	{
-	        byte[] byteSendData = new byte[200];
-	        int sendcnt = 0;						         // 헥사로 보낼때의 데이터 수
-	        try
-	        {
-		foreach (string s in msg.Split(' '))
-		{
-		        if (null != s && "" != s)
-			byteSendData[sendcnt++] = Convert.ToByte(s, 16);	        //스트링s를 16진수 바이트로 차곡차곡
+			}
+			 */
 		}
-		serialPort1.Write(byteSendData, 0, sendcnt);
-	        }
-	        catch (System.Exception ex)
-	        {
-		MessageBox.Show(ex.Message, "SEND 데이터 오류");
-	        }
-	}
 
-	private void btnBGPolling_Click(object sender, EventArgs e)
-	{
-	        sendmsg("ff 20 07 00 00 00 00");
-	}
+		private void btnclose_Click(object sender, EventArgs e)
+		{
+			serialPort1.Close();
+		}
 
-	private void btnACC_Click(object sender, EventArgs e)
-	{
+		private void btnAPStart_Click(object sender, EventArgs e)
+		{
+			sendmsg("ff 07 03");
+		}
 
-	        if (chkRepeat.Checked && accState == 0)
-	        {
-		rxTimer.Interval = Convert.ToInt32(txtRepeat.Text);
-		rxTimer.Enabled = true;
-		//sensorTimer.Interval = Convert.ToInt32(txtRepeat.Text);
-		//sensorTimer.Enabled = true;
-		btnACC.Text = "ACC Stop";
-		accState = 1;
-	        }
-	        else if (accState == 1)
-	        {
-		rxTimer.Enabled = false;
-		btnACC.Text = "ACC";
-		accState = 0;
-	        }
+		private void btnAPStop_Click(object sender, EventArgs e)
+		{
+			sendmsg("ff 09 03");
+		}
 
-	        else
-	        {
-		sendmsg("ff 08 07 00 00 00 00");
-	        }
+		private void sendmsg(string msg)
+		{
+			byte[] byteSendData = new byte[200];
+			int sendcnt = 0;						         // 헥사로 보낼때의 데이터 수
+			try
+			{
+				foreach (string s in msg.Split(' '))
+				{
+					if (null != s && "" != s)
+						byteSendData[sendcnt++] = Convert.ToByte(s, 16);	        //스트링s를 16진수 바이트로 차곡차곡
+				}
+				serialPort1.Write(byteSendData, 0, sendcnt);
+			}
+			catch (System.Exception ex)
+			{
+				MessageBox.Show(ex.Message, "SEND 데이터 오류");
+			}
+		}
 
-	}
+		private void btnBGPolling_Click(object sender, EventArgs e)
+		{
+			sendmsg("ff 20 07 00 00 00 00");
+		}
 
-	private void btnTestkey_Click(object sender, EventArgs e)
-	{
-	        keyInputTimer.Interval = 500;
-	        keyInputTimer.Enabled = true;
+		private void btnACC_Click(object sender, EventArgs e)
+		{
 
-	}
+			if (chkRepeat.Checked && accState == 0)
+			{
+				rxTimer.Interval = Convert.ToInt32(txtRepeat.Text);
+				rxTimer.Enabled = true;
+				//sensorTimer.Interval = Convert.ToInt32(txtRepeat.Text);
+				//sensorTimer.Enabled = true;
+				btnACC.Text = "ACC Stop";
+				accState = 1;
+			}
+			else if (accState == 1)
+			{
+				rxTimer.Enabled = false;
+				btnACC.Text = "ACC";
+				accState = 0;
+			}
 
-	private void keyInputTimer_Tick(object sender, EventArgs e)
-	{
-	        SendKeys.Send("{RIGHT}");
-	}
+			else
+			{
+				sendmsg("ff 08 07 00 00 00 00");
+			}
 
-	private void chkRepeat_CheckedChanged(object sender, EventArgs e)
-	{
-	        if (chkRepeat.Checked)
-	        {
-		txtRepeat.Enabled = true;
-	        }
-	        else
-	        {
-		txtRepeat.Enabled = false;
-	        }
-	}
+		}
 
-	private void rxTimer_Tick(object sender, EventArgs e)
-	{
-	        if (chkRepeat.Checked)
-	        {
-		sendmsg("ff 08 07 00 00 00 00");
-	        }
-	}
+		private void btnTestkey_Click(object sender, EventArgs e)
+		{
+			keyInputTimer.Interval = 500;
+			keyInputTimer.Enabled = true;
 
-	private void sensorTimer_Tick(object sender, EventArgs e)
-	{
+		}
 
-	        /*
-	        if (tstRange(xx, 208, 10 + 40) && tstRange(yy, 240, 5 + 45) && tstRange(zz, 210, 10 + 40) && statFlag1 == false)
-	        {
+		private void keyInputTimer_Tick(object sender, EventArgs e)
+		{
+			SendKeys.Send("{RIGHT}");
+		}
+
+		private void chkRepeat_CheckedChanged(object sender, EventArgs e)
+		{
+			if (chkRepeat.Checked)
+			{
+				txtRepeat.Enabled = true;
+			}
+			else
+			{
+				txtRepeat.Enabled = false;
+			}
+		}
+
+		private void rxTimer_Tick(object sender, EventArgs e)
+		{
+			if (chkRepeat.Checked)
+			{
+				sendmsg("ff 08 07 00 00 00 00");
+			}
+		}
+
+		private void sensorTimer_Tick(object sender, EventArgs e)
+		{
+
+			/*
+			if (tstRange(xx, 208, 10 + 40) && tstRange(yy, 240, 5 + 45) && tstRange(zz, 210, 10 + 40) && statFlag1 == false)
+			{
 		statFlag1 = true;
 		statCnt = 0;
 		label1.Text = "pass";
-	        }
-	        else if (tstRange(xx, 28, 20 + 30 + 25) && tstRange(yy, 216, 10 + 40 + 25) && tstRange(zz, 183, 35 + 15 + 25) && statFlag2 == false)
-	        {
+			}
+			else if (tstRange(xx, 28, 20 + 30 + 25) && tstRange(yy, 216, 10 + 40 + 25) && tstRange(zz, 183, 35 + 15 + 25) && statFlag2 == false)
+			{
 		statFlag2 = true;
 		statCnt = 0;
 		label2.Text = "pass";
-	        }
-	        else if (tstRange(xx, 162, 35 + 15 + 25) && tstRange(yy, 35, 25 + 25 + 25) && tstRange(zz, 50, 10 + 40 + 25) && statFlag2 == false)
-	        {
+			}
+			else if (tstRange(xx, 162, 35 + 15 + 25) && tstRange(yy, 35, 25 + 25 + 25) && tstRange(zz, 50, 10 + 40 + 25) && statFlag2 == false)
+			{
 		statFlag2 = true;
 		statCnt = 0;
 		label2.Text = "pass";
-	        }
-	        else if (tstRange(xx, 205, 15 + 35) && tstRange(yy, 238, 8 + 32) && tstRange(zz, 222, 12 + 38) && statFlag3 == false)
-	        {
+			}
+			else if (tstRange(xx, 205, 15 + 35) && tstRange(yy, 238, 8 + 32) && tstRange(zz, 222, 12 + 38) && statFlag3 == false)
+			{
 		statFlag3 = true;
 		statCnt = 0;
 		label3.Text = "pass";
-	        }
+			}
 
 
-	        if (statFlag1 == true && statFlag2 == true && statFlag3 == true)
-	        {
+			if (statFlag1 == true && statFlag2 == true && statFlag3 == true)
+			{
 		btnQ.Enabled = false;
 		SendKeys.Send("{RIGHT}");
 		statFlag1 = false;
@@ -402,15 +407,15 @@ namespace serialport01
 		label2.Text = "---";
 		label3.Text = "---";
 		statCnt = 0;
-	        }
+			}
 
-	        if (statFlag1 == true)
-	        {
+			if (statFlag1 == true)
+			{
 		statCnt++;
-	        }
+			}
 
-	        if (statCnt == 3)
-	        {
+			if (statCnt == 3)
+			{
 		statFlag1 = false;
 		statFlag2 = false;
 		statFlag3 = false;
@@ -418,24 +423,24 @@ namespace serialport01
 		label2.Text = "---";
 		label3.Text = "---";
 		statCnt = 0;
-	        }
-	        */
+			}
+			*/
+
+		}
+
+		private void btnClear_Click(object sender, EventArgs e)
+		{
+			textBoxDialog.Text = "";
+		}
+
+		private bool tstRange(int testnum, int num, int range)
+		{
+			if (num + range > testnum && num - range < testnum)
+				return true;
+			return false;
+		}
+
+
 
 	}
-
-	private void btnClear_Click(object sender, EventArgs e)
-	{
-	        textBoxDialog.Text = "";
-	}
-
-	private bool tstRange(int testnum, int num, int range)
-	{
-	        if (num + range > testnum && num - range < testnum)
-		return true;
-	        return false;
-	}
-
-
-
-        }
 }
